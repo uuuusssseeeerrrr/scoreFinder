@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>DPS</title>
+    <link
+            href="styles.css"
+            rel="stylesheet"
+            type="text/css"/>
+    <link
+            rel="stylesheet"
+            href="./lib/SpoqaHanSansNeo.min.css"/>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!--    <script src="./lib/vue.min.js"></script>-->
+    <script src="./lib/lucide.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+    <div id="app"></div>
+</div>
+
+<script src="components/updateArea.js"></script>
+<script src="components/listArea.js"></script>
+<script src="components/combatArea.js"></script>
+
+<script>
+  const {createApp, ref, onMounted, onUnmounted, computed} = Vue;
+
+  const app = createApp({
+    components: {
+      UpdateArea: window.UpdateArea,
+      ListArea: window.ListArea,
+      CombatArea:window.CombatArea,
+    },
+    setup() {
+      const isDragging = ref(false);
+      const startX = ref(0);
+      const startY = ref(0);
+      const initialStageX = ref(0);
+      const initialStageY = ref(0);
+
+      const party1Data = ref([]);
+      const party2Data = ref([]);
+      const isReady = ref(true);
+      const isCombatReady = ref(false);
+      const statusText = ref("분석대기중입니다.");
+      const searchState = ref("state-ready");
+
+      // 창 이동 이벤트
+      const handleMouseDown = (e) => {
+        isDragging.value = true;
+        startX.value = e.screenX;
+        startY.value = e.screenY;
+        initialStageX.value = window.screenX;
+        initialStageY.value = window.screenY;
+      };
+
+      const handleMouseMove = (e) => {
+        if (isDragging.value && window.javaBridge) {
+          const deltaX = e.screenX - startX.value;
+          const deltaY = e.screenY - startY.value;
+
+          window.javaBridge.moveWindow(
+            initialStageX.value + deltaX,
+            initialStageY.value + deltaY
+          );
+        }
+      };
+
+      const handleMouseUp = () => {
+        isDragging.value = false;
+      };
+
+      onMounted(() => {
+        document.addEventListener("mousedown", handleMouseDown);
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("mouseup", handleMouseUp);
+      });
+
+      onUnmounted(() => {
+        document.removeEventListener("mousedown", handleMouseDown);
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      });
+
+      window.addEventListener('sendOcrData', (e) => {
+        console.log(e.detail)
+        party1Data.value = e.detail['party1'] || []
+        party2Data.value = e.detail['party2'] || []
+      });
+
+      window.addEventListener('sendToolData', (e) => {
+        e.detail.forEach(item => {
+          let userdata = party1Data.value.find(data => data.text.includes(item.name))
+            || party2Data.value.find(data => data.text.includes(item.name));
+
+          if (userdata) {
+            userdata.server = item.server
+            userdata.combatPower = item.combatPower
+            userdata.combatScore = item.combatScore
+          }
+        });
+
+        isCombatReady.value = true;
+      });
+
+      window.addEventListener('sendStatus', (e) => {
+        if(!isCombatReady.value) {
+          switch(e.detail) {
+            case "partyCapturingStart":
+              searchState.value = "state-loading";
+              statusText.value = "파티창을 찾았습니다. 분석을 시작합니다";
+              break;
+            case "partyCapturingDone":
+              searchState.value = "state-ready";
+              statusText.value = "분석이 완료되었습니다.";
+              break;
+          }
+        }
+      });
+
+      // 조회
+      const searchClick = () => {
+        isReady.value = !isReady.value;
+        let textArray = party1Data.value.map(item => item.text);
+        textArray.push(...party2Data.value.map(item => item.text));
+        window.javaBridge.searchUser(JSON.stringify(textArray));
+      };
+
+      const combinedData = computed(() =>
+        [...party1Data.value, ...party2Data.value]
+      );
+
+      // 정보창 닫을때
+      const closeCombatClick = () => {
+        isCombatReady.value = false;
+        isReady.value = true;
+        searchState.value = "state-ready";
+        statusText.value = "분석대기중입니다.";
+      }
+
+      return {
+        party1Data,
+        party2Data,
+        isReady,
+        searchClick,
+        isCombatReady,
+        combinedData,
+        closeCombatClick,
+        statusText,
+        searchState,
+      };
+    },
+    template: `
+      <div class="header">
+        <div class="logoArea">
+          <img src="./assets/logo.png" alt=""/>
+        </div>
+        <div class="title">
+          <span>SCORE FINDER</span>
+        </div>
+      </div>
+
+      <div class="str">파티 1</div>
+      <ListArea :rows="party1Data"/>
+
+      <div class="str">파티 2</div>
+      <ListArea :rows="party2Data"/>
+
+      <div class="state" :class="[searchState]">
+        <div class="status"></div>
+        <div class="tick">{{ statusText }}</div>
+      </div>
+
+      <UpdateArea/>
+
+      <div class="searchArea">
+        <input type="button" class="searchBtn" :class="isReady ? 'ready' : 'loading'" :disabled="!isReady" value="조회"
+               @click="searchClick">
+      </div>
+
+      <Teleport to="body">
+        <CombatArea @closeCombatClick="closeCombatClick" :isCombatReady="isCombatReady" :rows="combinedData"/>
+      </Teleport>
+    `
+  });
+
+  window.addEventListener('javaReady', () => {
+    if (window.setupVueErrorHandler) {
+      window.setupVueErrorHandler(app);
+    }
+  }, {once: true});
+
+  app.mount('#app');
+</script>
+</body>
+</html>

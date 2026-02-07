@@ -1,0 +1,12 @@
+POST https://www.aion2tool.com/api/character/search-all-servers
+Content-Type: application/json
+Referer: https://www.aion2tool.com
+Origin: https://www.aion2tool.com
+
+{
+  "keyword":"한밤",
+  "race":"2"
+}
+
+###
+GET https://www.aion2tool.com/char/serverid=1007/%EA%B4%91%EA%B0%9C%ED%86%A0
