@@ -11,16 +11,24 @@ class EasyOCR() {
     private val gson = Gson()
     private val logger = KotlinLogging.logger {}
 
+    companion object {
+        val appDataPath: String? = System.getenv("LOCALAPPDATA")
+        val pythonFile = File(appDataPath, "/aion2scf/python/ocr_script.py")
+    }
+
+    init {
+        if(!pythonFile.exists()) {
+            pythonFile.parentFile?.mkdirs()
+            pythonFile.writeText(ImagePythonScript.pythonScript)
+        }
+    }
+
     suspend fun recognizeText(imagePath: String): List<OcrResult> = withContext(Dispatchers.IO) {
         try {
-            val resDir = System.getProperty("compose.application.resources.dir")
-            val appDataPath = System.getenv("LOCALAPPDATA")
-
             // Python 스크립트 실행
             val processBuilder = ProcessBuilder(
                 File(appDataPath, "Programs\\Python\\Python314/python.exe").absolutePath,
-                File(resDir, "ocr_script.py").absolutePath,
-//                File("./pythonScript/ocr_script.py").absolutePath,
+                pythonFile.absolutePath,
                 imagePath
             )
 
@@ -42,7 +50,7 @@ class EasyOCR() {
 
             // JSON 파싱
             val type = object : TypeToken<List<OcrResult>>() {}.type
-            gson.fromJson(output, type);
+            gson.fromJson(output, type)
         } catch (e: Exception) {
             logger.error(e) { "OCR 실행 중 오류" }
             emptyList()

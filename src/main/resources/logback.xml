@@ -11,10 +11,10 @@
 
     <!-- 일반 로그 파일 (날짜별 롤링) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/dpsmeter.log</file>
+        <file>${LOG_DIR}/scoreFinder.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 날짜별로 파일 생성 -->
-            <fileNamePattern>${LOG_DIR}/dpsmeter.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/scoreFinder.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 30일 보관 -->
             <maxHistory>30</maxHistory>
             <!-- 전체 로그 크기 제한 (1GB) -->
@@ -27,12 +27,12 @@
 
     <!-- 에러 전용 로그 파일 -->
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/dpsmeter-error.log</file>
+        <file>${LOG_DIR}/scoreFinder-error.log</file>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>ERROR</level>
         </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_DIR}/dpsmeter-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/scoreFinder-error.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>

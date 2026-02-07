@@ -38,7 +38,8 @@ class ImageProcessor {
     private suspend fun process(): MutableMap<String, List<OcrResult>> {
         val titleImageFile = ImageCapture.titleCapture()
         lateinit var partyImageFile: File
-        val titleOcrList = EasyOCR().recognizeText(titleImageFile.absolutePath)
+        val easyOcr = EasyOCR()
+        val titleOcrList = easyOcr.recognizeText(titleImageFile.absolutePath)
 
         if (titleOcrList.isNotEmpty()) {
             if (titleOcrList[0].text.contains("성역")) {
@@ -47,7 +48,7 @@ class ImageProcessor {
 
                 _statusFlow.emit("partyCapturingStart")
                 partyImageFile = ImageCapture.partyCapture("성역")
-                val partyOcrList = EasyOCR().recognizeText(partyImageFile.absolutePath)
+                val partyOcrList = easyOcr.recognizeText(partyImageFile.absolutePath)
                 val filteredOcrList =
                     partyOcrList.filter { it.text.contains("파티") || it.text.contains("[") || it.text.contains("]") }
                 val partyOneBbox = filteredOcrList.firstOrNull { it.text.contains("파티 1") }?.bbox[0]

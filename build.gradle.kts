@@ -51,15 +51,15 @@ compose.desktop {
             targetFormats(TargetFormat.Msi)
             packageName = "aion2ScoreFinder"
             packageVersion = project.version.toString()
-            copyright = "under MIT License"
-            appResourcesRootDir.set(project.layout.projectDirectory.dir("pythonScript"))
+            copyright = "MIT License"
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("app-resources"))
 
             windows {
                 upgradeUuid = "ad6d277e-08d9-492a-ae6b-36427df321c6"   // 인터넷페이지에서 대충 만듬
                 includeAllModules = true
                 shortcut = true
                 menu = true
-                iconFile.set(project.file("src/main/resources/assets/icon.ico"))
+                iconFile.set(project.file("src/main/resources/web/assets/icon.ico"))
             }
         }
     }
