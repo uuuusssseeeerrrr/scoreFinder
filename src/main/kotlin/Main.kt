@@ -3,6 +3,7 @@ package com.score
 import com.score.image.ImageProcessor
 import com.score.ocr.OcrResult
 import com.score.webview.Browser
+import com.score.webview.GitReleaseParser
 import io.github.oshai.kotlinlogging.KotlinLogging
 import javafx.application.Platform
 import javafx.stage.Stage
@@ -24,6 +25,10 @@ fun main() {
 
         Platform.startup {
             browser.start(Stage())
+        }
+
+        launch(Dispatchers.Default) {
+            GitReleaseParser.parse()
         }
 
         launch(Dispatchers.IO) {

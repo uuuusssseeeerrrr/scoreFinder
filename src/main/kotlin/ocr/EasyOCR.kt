@@ -27,7 +27,7 @@ class EasyOCR() {
         try {
             // Python 스크립트 실행
             val processBuilder = ProcessBuilder(
-                File(appDataPath, "Programs\\Python\\Python314/python.exe").absolutePath,
+                "python",
                 pythonFile.absolutePath,
                 imagePath
             )

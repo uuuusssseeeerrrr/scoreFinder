@@ -174,12 +174,14 @@
         <div class="tick">{{ statusText }}</div>
       </div>
 
-      <UpdateArea/>
-
       <div class="searchArea">
         <input type="button" class="searchBtn" :class="isReady ? 'ready' : 'loading'" :disabled="!isReady" value="조회"
                @click="searchClick">
       </div>
+
+      <Teleport to="body">
+        <UpdateArea/>
+      </Teleport>
 
       <Teleport to="body">
         <CombatArea @closeCombatClick="closeCombatClick" :isCombatReady="isCombatReady" :rows="combinedData"/>
