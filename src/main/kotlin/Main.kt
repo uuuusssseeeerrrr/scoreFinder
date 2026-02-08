@@ -41,7 +41,6 @@ fun main() {
 
         launch(Dispatchers.Default) {
             imageProcessor.statusFlow.collect { status ->
-                logger.info { "Status: $status" }
                 browser.sendStatus(status)
             }
         }

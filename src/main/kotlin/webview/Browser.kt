@@ -111,7 +111,6 @@ class Browser : Application() {
 //            val json = """{"party1":[{"text":"한밤[콰이]","confidence":0.9985337},{"text":"연한커피[이스]","confidence":0.88061714},{"text":"턱키루키[울고]","confidence":0.47957313},{"text":"Oioi[울고]","confidence":0.8643941}],"party2":[{"text":"EunLee[과이]","confidence":0.8025098},{"text":"멘슬[과이]","confidence":0.49863476},{"text":"민초아[트리]","confidence":0.45212522}]}"""
 //            val json = """{"party1":[{"text":"한밤[콰이]","confidence":0.9985337}]}"""
 
-            logger.info { "OcrData: $json" }
             engine.executeScript(
                 """
                     (function() {

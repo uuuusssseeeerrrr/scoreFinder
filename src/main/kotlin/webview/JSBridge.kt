@@ -56,7 +56,6 @@ class JSBridge {
     }
 
     fun searchUser(dataStr: String) {
-        logger.info { "searchUser: $dataStr" }
         CoroutineScope(Dispatchers.JavaFx).launch {
             _events.emit(dataStr)  // JSON 문자열 그대로 emit
         }
